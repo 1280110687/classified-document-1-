@@ -68,3 +68,61 @@ kits.randomHexColor = function () {
   }
   return color;
 }
+
+/**
+ * @description 从本地存储中读取复杂数据
+ * @param {string} 要以哪个键从本地存储中读取数据
+ * @returns {object} 读取出来的，镜JSON转换的复杂数据
+ */
+//获取本地数据
+kits.loadArrayFromLocalStorage = function(key){
+  let json = localStorage.getItem(key);
+  let arr = JSON.parse(json);
+  return arr || [];
+}
+
+/**
+ * @description 封装好的把复杂数据存储到本地里面的方法，默认是存储json格式字符串
+ * @param {string} key 存储到本地里面的键
+ * @param {object} obj 要存储的复杂数据
+ * @returns undefined
+ */
+// 存储数据到浏览器本地
+kits.saveArrayTolLocalStorage = function(key,obj){
+  let json = JSON.stringify(obj);
+  localStorage.setItem(key,json);
+}
+
+// 向本地存储里指定 key 追加数据
+kits.appendDataToArray = function(key,data){
+  let arr = this.loadArrayFromLocalStorage(key);
+  let json = JSON.stringify(data);
+  arr.append(data);
+  this.saveArrayTolLocalStorage(key,arr);
+}
+
+// 根据id从本地存储中指定key中删除数据
+kits.deleteLocalDataById = function(key,id){
+  let arr = this.loadArrayFromLocalStorage(key);
+  arr.forEach((e,i) =>{
+    if(e.id == id){
+      arr.splice(i,1);
+    }
+  });
+  this.saveArrayTolLocalStorage(key,arr);
+}
+
+// 根据ID修改数据
+kits.modifyLocalDataById = function(key,id,data){
+  let arr = this.loadArrayFromLocalStorage(key);
+  let flag = false;
+  arr.forEach(function(e,i){
+    if(e.id == id){
+      flag = true;
+      arr[i] = data;
+      return;
+    }
+  })
+  this.saveArrayTolLocalStorage(key,arr);
+  return flag;
+}
