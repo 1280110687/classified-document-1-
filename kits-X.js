@@ -126,3 +126,98 @@ kits.modifyLocalDataById = function(key,id,data){
   this.saveArrayTolLocalStorage(key,arr);
   return flag;
 }
+
+/**
+ * JS 计算两个时间间隔多久（时分秒）
+ * @param startTime "时间戳"
+ * @param endTime "时间戳"
+ * @return 1天2时3分5秒
+ */
+export function twoTimeInterval(startTime, endTime) {
+  // 时间相差秒数
+  let dateDiff = endTime - startTime;
+
+  // 计算出相差天数
+  let days = Math.floor(dateDiff / (24 * 3600 * 1000));
+
+  // 计算出小时数
+  let residue1 = dateDiff % (24 * 3600 * 1000); // 计算天数后剩余的毫秒数
+  let hours = Math.floor(residue1 / (3600 * 1000));
+
+  // 计算相差分钟数
+  let residue2 = residue1 % (3600 * 1000); // 计算小时数后剩余的毫秒数
+  let minutes = Math.floor(residue2 / (60 * 1000));
+
+  // 计算相差秒数
+  let residue3 = residue2 % (60 * 1000); // 计算分钟数后剩余的毫秒数
+  let seconds = Math.floor(residue3 / 1000);
+
+  // 计算相差毫秒数
+  let residue4 = residue3 % 1000; // 计算秒数后剩余的毫秒数
+  let millisecond = residue4;
+
+  let returnVal = "";
+  if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
+    returnVal = millisecond == 0 ? "" : millisecond + "毫秒";
+  } else {
+    returnVal =
+      (days == 0 ? "" : days + "天") +
+      (hours == 0 ? "" : days + "时") +
+      (minutes == 0 ? "" : minutes + "分") +
+      (seconds == 0 ? "" : seconds + "秒");
+  }
+
+  return returnVal;
+}
+
+/**
+ * 数组根据数组对象中的某个属性值进行排序的方法
+ * 使用例子：list.sort(sortBy('xxx',false)) // 表示根据xxx属性降序排列;若第二个参数不传递，默认表示升序排序
+ * @param attr 排序的属性
+ * @param rev true表示升序排列，false降序排序
+ * */
+export function sortBy(attr, rev) {
+  //第二个参数没有传递 默认升序排列
+  if (rev == undefined) {
+    rev = 1;
+  } else {
+    rev = rev ? 1 : -1;
+  }
+  return function (a, b) {
+    a = a[attr];
+    b = b[attr];
+    if (a < b) {
+      return rev * -1;
+    }
+    if (a > b) {
+      return rev * 1;
+    }
+    return 0;
+  };
+}
+
+/**
+ * @param {Function} func
+ * @param {number} wait
+ * @param {boolean} immediate
+ * @return {*}
+ */
+export function debounce(func, wait, immediate) {
+  let timeout, args, context, timestamp, result;
+
+  const later = function () {
+    // 据上一次触发时间间隔
+    const last = +new Date() - timestamp;
+
+    // 上次被包装函数被调用时间间隔 last 小于设定时间间隔 wait
+    if (last < wait && last > 0) {
+      timeout = setTimeout(later, wait - last);
+    } else {
+      timeout = null;
+      // 如果设定为immediate===true，因为开始边界已经调用过了此处无需调用
+      if (!immediate) {
+        result = func.apply(context, args);
+        if (!timeout) context = args = null;
+      }
+    }
+  };
